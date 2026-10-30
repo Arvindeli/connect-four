@@ -1,20 +1,31 @@
 # Connect Four
 
-A 6×6 terminal game for two humans or one human against the computer.
+A Python terminal implementation of Connect Four on a 6×6 board, with local
+two-player play, a heuristic computer opponent, and save/load support.
+
+## Features
+
+- Play against another person or the computer; choose either color in single-player mode.
+- Connect four horizontally, vertically, or diagonally. White moves first.
+- The computer prioritizes immediate wins and blocks, then scores candidate moves
+  and randomly selects among equally rated options.
+- Detect full-board draws and positions where neither player can form a winning line.
+- Resume saved games with the board, turn, mode, and human color restored.
+- Resize the terminal during play without losing game state.
 
 ## Requirements
 
 - Python 3.10 or newer.
 - Python's standard-library `curses` module, normally available on Linux and macOS.
-- An interactive UTF-8 terminal with arrow-key support and enough space for the
-  board and messages; use at least 80 columns and 24 rows.
+- An interactive UTF-8 terminal with arrow-key support, at least 80 columns and
+  24 rows, and a font that displays the Unicode pieces correctly.
 
 No third-party Python packages are required on supported systems. Standard
 Windows Python installations do not include `curses`.
 
 ## Launch
 
-Open a terminal in the project folder, then run:
+Open a terminal in the project folder and run:
 
 ```bash
 python3 base.py
@@ -22,45 +33,37 @@ python3 base.py
 
 ## Controls
 
-- Menus: Up/Down and Enter, or the numbered option.
-- Game: Left/Right and Enter, or keys 1–6 to play a column immediately.
-- Press `q` during a human turn to quit, then `y` to save or `n` to leave
-  without saving.
-- If saving fails, press `r` to retry or `g` to return to the game.
-- Press any key to dismiss help, load errors, or end-of-game messages.
+| Action | Keys |
+| --- | --- |
+| Navigate menus | Up/Down and Enter, or a numbered option |
+| Select and play a column | Left/Right and Enter |
+| Play a column directly | 1–6 |
+| Quit during a human turn | `q`, then `y` to save or `n` to leave without saving |
+| Retry a failed save or return to play | `r` or `g` |
+| Dismiss help, load errors, or game results | Any key |
 
-## Features
+If the terminal becomes smaller than 80×24, enlarge it to resume play.
 
-- White moves first. Connect four horizontally, vertically, or diagonally.
-- Human vs Human and Human vs AI modes; choose either color against the AI.
-- The computer takes an immediate win, blocks an immediate loss, then scores
-  candidate moves and randomly chooses among equal scores.
-- Full-board and early draw detection.
-- One save slot, `savegame.json`, beside `base.py`. Saving replaces that slot.
-- Saves are written to a temporary file in the same folder, then atomically
-  replace the save slot. Failures before replacement leave the previous save intact.
-- Continue Saved Game restores the board, turn, mode, and human color.
-- Missing or invalid saves display a message. Invalid files are left intact.
-- Windows smaller than 80 columns or 24 rows show a resize prompt. Enlarge the
-  terminal to resume; game state is retained while waiting.
-- Completing a resumed game removes its save file. If removal fails, a warning
-  is shown before returning to the menu. Leaving without saving leaves any
-  previous save intact.
+## Saved games
 
-## Checks
+The game uses one save slot, `savegame.json`, beside `base.py`. Choose
+**Continue Saved Game** from the menu to resume it. The game folder must be
+writable and have space available.
 
-Open a terminal in the project folder, then run:
+Saving atomically replaces the slot; failures before replacement preserve the
+previous save. Loading checks the saved board and turn information and reports
+invalid saves without modifying them.
+
+Completing a resumed game removes its save file, with a warning if removal
+fails. Leaving without saving preserves any previous save.
+
+## Tests
+
+From the project folder:
 
 ```bash
 python3 -m unittest -v test_base.py
 ```
 
-Tests use temporary save files and do not modify the runtime save.
-
-## Limitations
-
-- Piece alignment depends on the terminal's Unicode font support.
-- The computer uses a heuristic, not an exhaustive search.
-- Loading validates structure, gravity, turn counts, and unfinished-game status;
-  it does not reconstruct the complete move history.
-- Save writes require write permission and available space in the game folder.
+Tests cover game rules, immediate winning and blocking moves, save validation,
+save-failure handling, and terminal resizing. Save tests use temporary files.
